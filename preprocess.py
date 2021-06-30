@@ -6,24 +6,19 @@ from wordcloud import WordCloud
 # get data 
 with open('sample.txt', 'r', encoding='utf8', errors='ignore') as myfile:
     data = myfile.read()
-
+    
 split_sentence = nltk.sent_tokenize(data)
-
 word_T = []
 for x in split_sentence:
     word_T.append(nltk.word_tokenize(x))
-
 word_T = [re.sub(r'([^\s\w])+', '', w) for x in word_T for w in x]
-
 no_stopwords = [w for w in word_T if w not in nltk.corpus.stopwords.words('english') and w != '']
 
-stemmed = []
-indexes = {}
-i = 0
+stemmed, indexes, ind = [], {}, 0
 for x in no_stopwords:
     stemmed.append(nltk.stem.PorterStemmer().stem(x))
-    indexes.__setitem__(stemmed[i], i)
-    i = i+1
+    indexes.__setitem__(stemmed[ind], ind)
+    ind = ind+1
 
 # Word cloud visualization of common words
 dict = {}
