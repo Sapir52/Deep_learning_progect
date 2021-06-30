@@ -1,6 +1,17 @@
 # Project_deep_learning
 Introduction to Deep Learning: 4-part project
 
+# Purpose part 1: preprocess and visualize English sentences
+Pipeline:
+
+text -> preprocessed text -> 1-hot representation of words -> frequencies -> visualization
+
+# Purpose part 2: find the sentence most similar to given query
+Pipeline:
+
+query -> preprocess query -> compute query representation
+sentences -> preprocess sentences -> compute sentence representations
+
 # Purpose part 3: classification of images with text labels
 Pipeline:
 
