@@ -1,8 +1,14 @@
 # Project_deep_learning
 Introduction to Deep Learning: 4-part project
 
+# Purpose part 3: classification of images with text labels
+Pipeline:
 
-# purpose lab4: generate headline for an image
+Training: CIFAR-100 dataset and its labels -> CNN -> classification model
+
+Test: image ->preprocess image -> CNN -> get word vector of a label -> find 3 most relevant text labels
+
+# purpose part 4: generate headline for an image
 Pipeline:
 
 Training pipeline: 
