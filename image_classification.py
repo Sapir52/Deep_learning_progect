@@ -141,48 +141,16 @@ seq = iaa.Sequential([
     iaa.Affine(shear=(-10, 10),mode = ['symmetric','wrap']),
     iaa.Add((-5, 5)),
     iaa.Multiply((0.8, 1.2)),
-
 ],random_order=True)
 
-
-
 #Applying data augmentation to dataset
-data1 = seq.augment_images(data)
-data2 = seq.augment_images(data)
-data3 = seq.augment_images(data)
-data4 = seq.augment_images(data)
-data5 = seq.augment_images(data)
-data6 = seq.augment_images(data)
-data7 = seq.augment_images(data)
-data8 = seq.augment_images(data)
-data9 = seq.augment_images(data)
-data10 = seq.augment_images(data)
-
+data_list = [seq.augment_images(data) for i in range(10)]
 
 all_train = []
-all_train.extend(data/255)
-all_train.extend(data1/255)
-all_train.extend(data2/255)
-all_train.extend(data3/255)
-all_train.extend(data4/255)
-all_train.extend(data5/255)
-all_train.extend(data6/255)
-all_train.extend(data7/255)
-all_train.extend(data8/255)
-all_train.extend(data9/255)
-all_train.extend(data10/255)
+for data in data_list:
+        all_train.extend(data/255)
 
-all_labels=[]
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
+all_labels=[train[b'fine_labels'] for i in range(10)]
 
 #-----------------------------------------------------------------------------------------------------------------------
 all_train_shuffled, all_labels_shuffled= [], []
