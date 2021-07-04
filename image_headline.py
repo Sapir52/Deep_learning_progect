@@ -509,7 +509,7 @@ def plot_prediction(image):
 
 plot_prediction('dog.jpg')
 
-
+#-----------------------------------------------------------------------------------------------------------------------
 #Project part 4
 
 # read BBC news dataset file
@@ -559,7 +559,7 @@ x1,y1=sequences[:,:-1],sequences[:,-1]
 y1=to_categorical(y1,num_classes=vocab_size)
 seq_length=x1.shape[1]
 
-def get_model2(seq_length,vocab_size)
+def get_model_headline(seq_length,vocab_size)
     # define model LSTM
     modle_= Sequential()
     modle_.add(Embedding(vocab_size,50,input_length=seq_length))
@@ -570,7 +570,7 @@ def get_model2(seq_length,vocab_size)
     modle_.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
     return modle_
 
-modle_=get_model2()
+modle_=get_model_headline(seq_length,vocab_size)
 # fit model
 modle_.fit(x1,y1,batch_size=256,epochs=100)
 # save the model to file
