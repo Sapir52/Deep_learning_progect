@@ -63,6 +63,7 @@ from pickle import dump
 nltk.download('punkt')
 nltk.download('stopwords')
 
+# Project part 3 
 
 # Data set download
 url = 'https://www.cs.toronto.edu/~kriz/'
@@ -134,7 +135,7 @@ def unpickle(file):
         res = pickle.load(fo, encoding='bytes')
     return res
 
-#Create dictionaries containing the data.
+# Meta, Train, and Test are dictionaries containing data
 meta = unpickle('cifar-100-python/meta')
 fine_label_names = [t.decode('utf8') for t in meta[b'fine_label_names']]
 train = unpickle('cifar-100-python/train')
@@ -162,89 +163,31 @@ with open('cifar100.csv', 'w+') as f:
 
         f.write('cifar-100-python/img%s,%s\n'%(filename,label))
 
-#-----------------------------------------------------------------------------------------------------------------------
 #Classes
 Classes = pd.DataFrame(meta[b'fine_label_names'],columns = ['Classes'])
 data = data.reshape(50000, 3, 32, 32).transpose(0,2,3,1).astype("uint8")
 
-#Sample Images
-img_num = np.random.randint(0,1000)
-plt.figure(figsize=(.6,.6))
-plt.xticks([])
-plt.yticks([])
-plt.imshow(data[img_num])
-Classes.iloc[train[b'fine_labels'][img_num]]
-
-
-# num images row = 3, num images column = 5
-img_nums = np.random.randint(0,len(data),3*5)
-
-f, axarr = plt.subplots(3,5)
-
-for i in range(0,3):
-    for j in range(0,5):
-        axarr[i,j].imshow(data[img_nums[(i*5)+j]])
-        axarr[i,j].set_title(str(Classes.iloc[train[b'fine_labels'][img_nums[(i+1)*(j+1)-1]]]).split()[1])
-        axarr[i,j].axis('off')
-
+#-----------------------------------------------------------------------------------------------------------------------
+#**** Data Augmentation*****
 seq = iaa.Sequential([
     iaa.Fliplr(0.5),
     iaa.CropAndPad(px=(-2, 2),sample_independently=True,pad_mode=["constant", "edge"]),
     iaa.Affine(shear=(-10, 10),mode = ['symmetric','wrap']),
     iaa.Add((-5, 5)),
     iaa.Multiply((0.8, 1.2)),
-
 ],random_order=True)
 
-#-----------------------------------------------------------------------------------------------------------------------
-
 #Applying data augmentation to dataset
-data1 = seq.augment_images(data)
-data2 = seq.augment_images(data)
-data3 = seq.augment_images(data)
-data4 = seq.augment_images(data)
-data5 = seq.augment_images(data)
-data6 = seq.augment_images(data)
-data7 = seq.augment_images(data)
-data8 = seq.augment_images(data)
-data9 = seq.augment_images(data)
-data10 = seq.augment_images(data)
-
-#Sample Data Augmentation
-f, axarr = plt.subplots(3,5)
-
-for i in range(0,3):
-    for j in range(0,5):
-        axarr[i,j].imshow(data1[img_nums[(i*5)+j]])
-        axarr[i,j].set_title(str(Classes.iloc[train[b'fine_labels'][img_nums[(i+1)*(j+1)-1]]]).split()[1])
-        axarr[i,j].axis('off')
+data_list = [seq.augment_images(data) for i in range(10)]
 
 all_train = []
-all_train.extend(data/255)
-all_train.extend(data1/255)
-all_train.extend(data2/255)
-all_train.extend(data3/255)
-all_train.extend(data4/255)
-all_train.extend(data5/255)
-all_train.extend(data6/255)
-all_train.extend(data7/255)
-all_train.extend(data8/255)
-all_train.extend(data9/255)
-all_train.extend(data10/255)
+for data in data_list:
+        all_train.extend(data/255)
 
-all_labels=[]
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
-all_labels.extend(train[b'fine_labels'])
+all_labels=[train[b'fine_labels'] for i in range(10)]
 
 #-----------------------------------------------------------------------------------------------------------------------
+# shuffle the data to randomize any pattern in the order of the dataset.
 all_train_shuffled, all_labels_shuffled= [], []
 combined = list(zip(all_train, all_labels))
 random.shuffle(combined)
@@ -253,20 +196,23 @@ num_class = 100
 all_train_shuffled = np.asarray(all_train_shuffled)
 train_len = len(all_train_shuffled)
 
-def to_Vector(vec, vals=num_class):
+def one_hot(vec, vals=num_class):
     # Create vector
     out = np.zeros((len(vec), vals))
     out[range(len(vec)), vec] = 1
     return out
 
-all_labels_shuffled= to_Vector(all_labels_shuffled, num_class)
+all_labels_shuffled= one_hot(all_labels_shuffled, num_class)
 test_shuffled = np.vstack(test[b"data"])
 test_len = len(test_shuffled)
 test_shuffled = test_shuffled.reshape(test_len,3,32,32).transpose(0,2,3,1)/255
-test_labels = to_Vector(test[b'fine_labels'], num_class)
+test_labels = one_hot(test[b'fine_labels'], num_class)
 
 #-----------------------------------------------------------------------------------------------------------------------
 class CifarHelper():
+    '''
+    feeding the data into the model one small batch at a time. 
+    '''
     def __init__(self):
         self.i = 0
 
@@ -332,11 +278,11 @@ y_pred= get_model(x)
 #Loss Function
 softmaxx = tf1.nn.softmax_cross_entropy_with_logits_v2(labels = y_true,logits = y_pred)
 cross_entropy = tf1.reduce_mean(softmaxx)
+# This is optimizer
 optimizer = tf1.train.AdamOptimizer(.001)
 train = optimizer.minimize(cross_entropy)
 init = tf1.global_variables_initializer()
-config = tf1.ConfigProto()
-config.gpu_options.allow_growth = True
+
 saver = tf1.train.Saver()
 
 
@@ -386,7 +332,7 @@ model_path = 'cifar-100-python/models/model53.ckpt'
 print(accuracy_list)
 
 #-----------------------------------------------------------------------------------------------------------------------
-### save all data
+# Restore the model
 cuts, predictions = 200, []
 with tf1.Session() as sess:
     
@@ -398,8 +344,8 @@ with tf1.Session() as sess:
     for k in range(0,int(len(test_shuffled)/cuts)):
         predictions.extend(sess.run(acc2,feed_dict={x:test_shuffled[cuts*(k):cuts*(k+1)], y_true:test_labels[cuts*(k):cuts*(k+1)], hold_prob:1.0}))
     predictions = np.array(predictions)
-
-
+#-----------------------------------------------------------------------------------------------------------------------
+### save all data
 # Add the model to the CSV file
 model = keras.Sequential([keras.layers.Dense(units=1, input_shape=[1])])
 model.compile(optimizer='sgd', loss='mean_squared_error')
@@ -459,7 +405,7 @@ for i in range(0,3):
         axarr1[i,j].axis('off')
         f1.suptitle('Predicted Values')
         
-        
+#-----------------------------------------------------------------------------------------------------------------------        
 def plot_prediction(image):
     '''
     Helper Function
@@ -509,8 +455,9 @@ def plot_prediction(image):
 
 plot_prediction('dog.jpg')
 
+
 #-----------------------------------------------------------------------------------------------------------------------
-#Project part 4
+# Project part 4
 
 # read BBC news dataset file
 dataCsv=pd.read_csv('BBC news dataset.csv')
