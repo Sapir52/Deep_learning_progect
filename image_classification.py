@@ -158,14 +158,6 @@ data8 = seq.augment_images(data)
 data9 = seq.augment_images(data)
 data10 = seq.augment_images(data)
 
-#Sample Data Augmentation
-f, axarr = plt.subplots(3,5)
-
-for i in range(0,3):
-    for j in range(0,5):
-        axarr[i,j].imshow(data1[img_nums[(i*5)+j]])
-        axarr[i,j].set_title(str(Classes.iloc[train[b'fine_labels'][img_nums[(i+1)*(j+1)-1]]]).split()[1])
-        axarr[i,j].axis('off')
 
 all_train = []
 all_train.extend(data/255)
