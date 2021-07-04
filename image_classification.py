@@ -153,6 +153,7 @@ for data in data_list:
 all_labels=[train[b'fine_labels'] for i in range(10)]
 
 #-----------------------------------------------------------------------------------------------------------------------
+# shuffle the data to randomize any pattern in the order of the dataset.
 all_train_shuffled, all_labels_shuffled= [], []
 combined = list(zip(all_train, all_labels))
 random.shuffle(combined)
@@ -161,20 +162,23 @@ num_class = 100
 all_train_shuffled = np.asarray(all_train_shuffled)
 train_len = len(all_train_shuffled)
 
-def to_Vector(vec, vals=num_class):
+def one_hot(vec, vals=num_class):
     # Create vector
     out = np.zeros((len(vec), vals))
     out[range(len(vec)), vec] = 1
     return out
 
-all_labels_shuffled= to_Vector(all_labels_shuffled, num_class)
+all_labels_shuffled= one_hot(all_labels_shuffled, num_class)
 test_shuffled = np.vstack(test[b"data"])
 test_len = len(test_shuffled)
 test_shuffled = test_shuffled.reshape(test_len,3,32,32).transpose(0,2,3,1)/255
-test_labels = to_Vector(test[b'fine_labels'], num_class)
+test_labels = one_hot(test[b'fine_labels'], num_class)
 
 #-----------------------------------------------------------------------------------------------------------------------
 class CifarHelper():
+    '''
+    feeding the data into the model one small batch at a time. 
+    '''
     def __init__(self):
         self.i = 0
 
@@ -240,11 +244,11 @@ y_pred= get_model(x)
 #Loss Function
 softmaxx = tf1.nn.softmax_cross_entropy_with_logits_v2(labels = y_true,logits = y_pred)
 cross_entropy = tf1.reduce_mean(softmaxx)
+# This is optimizer
 optimizer = tf1.train.AdamOptimizer(.001)
 train = optimizer.minimize(cross_entropy)
 init = tf1.global_variables_initializer()
-config = tf1.ConfigProto()
-config.gpu_options.allow_growth = True
+
 saver = tf1.train.Saver()
 
 
@@ -294,7 +298,7 @@ model_path = 'cifar-100-python/models/model53.ckpt'
 print(accuracy_list)
 
 #-----------------------------------------------------------------------------------------------------------------------
-### save all data
+# Restore the model
 cuts, predictions = 200, []
 with tf1.Session() as sess:
     
@@ -306,8 +310,8 @@ with tf1.Session() as sess:
     for k in range(0,int(len(test_shuffled)/cuts)):
         predictions.extend(sess.run(acc2,feed_dict={x:test_shuffled[cuts*(k):cuts*(k+1)], y_true:test_labels[cuts*(k):cuts*(k+1)], hold_prob:1.0}))
     predictions = np.array(predictions)
-
-
+#-----------------------------------------------------------------------------------------------------------------------
+### save all data
 # Add the model to the CSV file
 model = keras.Sequential([keras.layers.Dense(units=1, input_shape=[1])])
 model.compile(optimizer='sgd', loss='mean_squared_error')
@@ -367,7 +371,7 @@ for i in range(0,3):
         axarr1[i,j].axis('off')
         f1.suptitle('Predicted Values')
         
-        
+#-----------------------------------------------------------------------------------------------------------------------        
 def plot_prediction(image):
     '''
     Helper Function
