@@ -101,7 +101,7 @@ def unpickle(file):
         res = pickle.load(fo, encoding='bytes')
     return res
 
-#Create dictionaries containing the data.
+# Meta, Train, and Test are dictionaries containing data
 meta = unpickle('cifar-100-python/meta')
 fine_label_names = [t.decode('utf8') for t in meta[b'fine_label_names']]
 train = unpickle('cifar-100-python/train')
@@ -129,31 +129,12 @@ with open('cifar100.csv', 'w+') as f:
 
         f.write('cifar-100-python/img%s,%s\n'%(filename,label))
 
-#-----------------------------------------------------------------------------------------------------------------------
 #Classes
 Classes = pd.DataFrame(meta[b'fine_label_names'],columns = ['Classes'])
 data = data.reshape(50000, 3, 32, 32).transpose(0,2,3,1).astype("uint8")
 
-#Sample Images
-img_num = np.random.randint(0,1000)
-plt.figure(figsize=(.6,.6))
-plt.xticks([])
-plt.yticks([])
-plt.imshow(data[img_num])
-Classes.iloc[train[b'fine_labels'][img_num]]
-
-
-# num images row = 3, num images column = 5
-img_nums = np.random.randint(0,len(data),3*5)
-
-f, axarr = plt.subplots(3,5)
-
-for i in range(0,3):
-    for j in range(0,5):
-        axarr[i,j].imshow(data[img_nums[(i*5)+j]])
-        axarr[i,j].set_title(str(Classes.iloc[train[b'fine_labels'][img_nums[(i+1)*(j+1)-1]]]).split()[1])
-        axarr[i,j].axis('off')
-
+#-----------------------------------------------------------------------------------------------------------------------
+#**** Data Augmentation*****
 seq = iaa.Sequential([
     iaa.Fliplr(0.5),
     iaa.CropAndPad(px=(-2, 2),sample_independently=True,pad_mode=["constant", "edge"]),
@@ -163,7 +144,7 @@ seq = iaa.Sequential([
 
 ],random_order=True)
 
-#-----------------------------------------------------------------------------------------------------------------------
+
 
 #Applying data augmentation to dataset
 data1 = seq.augment_images(data)
