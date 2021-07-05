@@ -362,7 +362,6 @@ def show_compare(test_shuffled, df, number, title):
             axarr[i,j].set_title(str(Classes.iloc[df[img_nums[(i+1)*(j+1)-1]]]).split()[number])
             axarr[i,j].axis('off')
             f.suptitle(title)
-    f1, axarr1 = plt.subplots(3,5)
     
 show_compare(test_shuffled, labels_not_vec, 1, 'Actual Values')
 show_compare(test_shuffled, predictions_df, 2, 'Predicted Values')
