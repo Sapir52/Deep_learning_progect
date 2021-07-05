@@ -386,25 +386,18 @@ print('True Label: '+str(Classes.iloc[labels_not_vec[img_num]]).split()[1])
 print('Prediction: '+str(Classes.iloc[predictions_df.iloc[img_num]]).split()[2])
 
 
-f, axarr = plt.subplots(3,5)
-img_nums = np.random.randint(0,len(test_shuffled),3*5)
-
-
-for i in range(0,3):
-    for j in range(0,5):
-        axarr[i,j].imshow(test_shuffled[img_nums[(i*5)+j]])
-        axarr[i,j].set_title(str(Classes.iloc[labels_not_vec[img_nums[(i+1)*(j+1)-1]]]).split()[1])
-        axarr[i,j].axis('off')
-        f.suptitle('Actual Values')
-f1, axarr1 = plt.subplots(3,5)
-
-for i in range(0,3):
-    for j in range(0,5):
-        axarr1[i,j].imshow(test_shuffled[img_nums[(i*5)+j]])
-        axarr1[i,j].set_title(str(Classes.iloc[predictions_df.iloc[img_nums[(i+1)*(j+1)-1]]]).split()[2])
-        axarr1[i,j].axis('off')
-        f1.suptitle('Predicted Values')
-        
+def show_compare(test_shuffled, df, number, title):
+    f, axarr = plt.subplots(3,5)
+    img_nums = np.random.randint(0,len(test_shuffled),3*5)
+    for i in range(0,3):
+        for j in range(0,5):
+            axarr[i,j].imshow(test_shuffled[img_nums[(i*5)+j]])
+            axarr[i,j].set_title(str(Classes.iloc[df[img_nums[(i+1)*(j+1)-1]]]).split()[number])
+            axarr[i,j].axis('off')
+            f.suptitle(title)
+    
+show_compare(test_shuffled, labels_not_vec, 1, 'Actual Values')
+show_compare(test_shuffled, predictions_df, 2, 'Predicted Values')
 #-----------------------------------------------------------------------------------------------------------------------        
 def plot_prediction(image):
     '''
