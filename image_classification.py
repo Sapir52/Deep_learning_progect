@@ -201,7 +201,6 @@ hold_prob = tf1.placeholder(tf1.float32)
 
 
 #Functions for initializing layers
-#Functions for initializing layers
 def init_weights(shape):
     return tf1.Variable(tf1.truncated_normal(shape, stddev=0.1))
 
