@@ -144,17 +144,14 @@ seq = iaa.Sequential([
 ],random_order=True)
 
 #Applying data augmentation to dataset
-data_list = [seq.augment_images(data) for i in range(10)]
-
-all_train = []
-for data in data_list:
-        all_train.extend(data/255)
-
-all_labels=[train[b'fine_labels'] for i in range(10)]
+all_train, all_labels = [], []
+for index in range(6):
+    all_train.extend(seq.augment_images(data)/255)
+    all_labels.extend(train[b'fine_labels'])
 
 #-----------------------------------------------------------------------------------------------------------------------
 # shuffle the data to randomize any pattern in the order of the dataset.
-all_train_shuffled, all_labels_shuffled= [], []
+all_train_shuffled, all_labels_shuffled = [], []
 combined = list(zip(all_train, all_labels))
 random.shuffle(combined)
 all_train_shuffled[:], all_labels_shuffled[:] = zip(*combined)
@@ -162,15 +159,18 @@ num_class = 100
 all_train_shuffled = np.asarray(all_train_shuffled)
 train_len = len(all_train_shuffled)
 
+# create one-hot vectors
 def one_hot(vec, vals=num_class):
-    # Create vector
-    out = np.zeros((len(vec), vals))
-    out[range(len(vec)), vec] = 1
+    n = len(vec)
+    out = np.zeros((n, vals))
+    out[range(n), vec] = 1
     return out
 
 all_labels_shuffled= one_hot(all_labels_shuffled, num_class)
+
 test_shuffled = np.vstack(test[b"data"])
 test_len = len(test_shuffled)
+
 test_shuffled = test_shuffled.reshape(test_len,3,32,32).transpose(0,2,3,1)/255
 test_labels = one_hot(test[b'fine_labels'], num_class)
 
@@ -201,13 +201,12 @@ hold_prob = tf1.placeholder(tf1.float32)
 
 
 #Functions for initializing layers
+#Functions for initializing layers
 def init_weights(shape):
-    init_random_dist = tf1.truncated_normal(shape, stddev=0.1)
-    return tf1.Variable(init_random_dist)
+    return tf1.Variable(tf1.truncated_normal(shape, stddev=0.1))
 
 def init_bias(shape):
-    init_bias_vals = tf1.constant(0.1, shape=shape)
-    return tf1.Variable(init_bias_vals)
+    return tf1.Variable(tf1.constant(0.1, shape=shape))
 
 def conv2d(x, W):
     return tf1.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
@@ -216,15 +215,11 @@ def max_pool_2by2(x):
     return tf1.nn.max_pool(x, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME')
 
 def convolutional_layer(input_x, shape):
-    W = init_weights(shape)
-    b = init_bias([shape[3]])
-    return tf1.nn.relu(conv2d(input_x, W) + b)
+    return tf1.nn.relu(conv2d(input_x, init_weights(shape)) + init_bias([shape[3]]))
 
 def normal_full_layer(input_layer, size):
     input_size = int(input_layer.get_shape()[1])
-    W = init_weights([input_size, size])
-    b = init_bias([size])
-    return tf1.matmul(input_layer, W) + b
+    return tf1.matmul(input_layer, init_weights([input_size, size])) + init_bias([size])
 
 def get_model(x):
     convo_1 = convolutional_layer(x,shape=[3,3,3,32])
@@ -256,7 +251,7 @@ saver = tf1.train.Saver()
 print(str(datetime.now()) + '\n')
 minibatch_check, accuracy  = 500, 0
 accuracy_list = []
-target_accuracy = 0.52
+target_accuracy = 1
 with tf1.Session(config=config) as sess:
     sess.run(init)
     i = 0
