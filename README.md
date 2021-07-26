@@ -1,7 +1,6 @@
 # Deep learning project
 Introduction to Deep Learning: 4-part project
 
-
 # Purpose part 1: preprocess and visualize English sentences
 Pipeline:
 
