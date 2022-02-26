@@ -36,7 +36,7 @@ url = 'https://www.cs.toronto.edu/~kriz/'
 last_percent_reported = None
 
 #-----------------------------------------------------------------------------------------------------------------------
-### download cifar100
+# download cifar100
 
 def download_progress_hook(count, blockSize, totalSize):
     """
@@ -92,7 +92,7 @@ def maybe_extract(filename, force=False):
 dataset = os.path.join('.', 'cifar-100-python.tar.gz')
 maybe_extract(dataset)
 #-----------------------------------------------------------------------------------------------------------------------
-### Get cifar100
+# Get cifar100
 def unpickle(file):
     '''
     Pickle loading CIFAR-100 data
