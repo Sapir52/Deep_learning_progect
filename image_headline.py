@@ -70,7 +70,7 @@ url = 'https://www.cs.toronto.edu/~kriz/'
 last_percent_reported = None
 
 #-----------------------------------------------------------------------------------------------------------------------
-### download cifar100
+# download cifar100
 
 def download_progress_hook(count, blockSize, totalSize):
     """
@@ -126,7 +126,7 @@ def maybe_extract(filename, force=False):
 dataset = os.path.join('.', 'cifar-100-python.tar.gz')
 maybe_extract(dataset)
 #-----------------------------------------------------------------------------------------------------------------------
-### Get cifar100
+# Get cifar100
 def unpickle(file):
     '''
     Pickle loading CIFAR-100 data
@@ -339,7 +339,7 @@ with tf1.Session() as sess:
         predictions.extend(sess.run(acc2,feed_dict={x:test_shuffled[cuts*(k):cuts*(k+1)], y_true:test_labels[cuts*(k):cuts*(k+1)], hold_prob:1.0}))
     predictions = np.array(predictions)
 #-----------------------------------------------------------------------------------------------------------------------
-### save all data
+# save all data
 # Add the model to the CSV file
 model = keras.Sequential([keras.layers.Dense(units=1, input_shape=[1])])
 model.compile(optimizer='sgd', loss='mean_squared_error')
