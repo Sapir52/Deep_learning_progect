@@ -34,7 +34,6 @@ import time
 # Data set download
 url = 'https://www.cs.toronto.edu/~kriz/'
 last_percent_reported = None
-
 #-----------------------------------------------------------------------------------------------------------------------
 # download cifar100
 
