@@ -59,7 +59,6 @@ from tensorflow.keras.layers import Dense,LSTM, Embedding
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from numpy import array
 from pickle import dump
-
 nltk.download('punkt')
 nltk.download('stopwords')
 
