@@ -44,7 +44,6 @@ def download_progress_hook(count, blockSize, totalSize):
     """
     global last_percent_reported
     percent = int(count * blockSize * 100 / totalSize)
-
     if last_percent_reported != percent:
         if percent % 5 == 0:
             sys.stdout.write("%s%%" % percent)
