@@ -283,19 +283,3 @@ test_loader = DeviceDataLoader(DataLoader(test_dataset, batch_size*2), device)
 result = evaluate(model, test_loader)
 # Saving and Loading the model
 torch.save(model.state_dict(), 'ResNet9_torch_cnn.pth')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
